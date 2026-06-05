@@ -1,7 +1,9 @@
 package com.example.bmp.ui.bookmarks
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,9 +17,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.EditNote
-import androidx.compose.material.icons.filled.Note
 import androidx.compose.material.icons.outlined.EditNote
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -93,10 +95,15 @@ fun BookmarksScreen(navController: NavHostController){
             LazyColumn(contentPadding = paddingValues,
                     state = rememberLazyListState()) {
                 items(bookmarks, key = {it.id}){bookmark ->
-                    BookmarkCard(bookmark, onBookMarkClicked = {
+                    BookmarkCard(bookmark,
+                            isSelected = bookmark.id in selectedIds,
+                            isInSelectionMode = selectedIds.isNotEmpty(),
+                            onBookMarkClicked = {
                         bookmarksViewModel.toggleBookmark(bookmark.id)
                     }, onNoteClick = {
                         bookmarksViewModel.openDialog(bookmark.id)
+                    }, onLongClick = {
+                        bookmarksViewModel.toggleSelection(bookmark.id)
                     })
                 }
             }
@@ -104,15 +111,36 @@ fun BookmarksScreen(navController: NavHostController){
 }
 
 @Composable
-fun BookmarkCard(bookmark: Article, onBookMarkClicked:() -> Unit, onNoteClick:() -> Unit){
+fun BookmarkCard(bookmark: Article,
+                 isSelected: Boolean,
+                 isInSelectionMode:Boolean,
+                 onBookMarkClicked:() -> Unit,
+                 onNoteClick:() -> Unit,
+                 onLongClick:() -> Unit){
     ElevatedCard(modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp) ) {
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .combinedClickable(
+                    onClick = {if(isInSelectionMode) onLongClick()},
+                    onLongClick = onLongClick
+            )) {
         Column{
-            AsyncImage(model = bookmark.imageUrl,
-                    contentDescription = bookmark.title,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxWidth().height(180.dp))
+            Box(modifier = Modifier.fillMaxWidth()) {
+                AsyncImage(model = bookmark.imageUrl,
+                        contentDescription = bookmark.title,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxWidth().height(180.dp))
+                if (isSelected) {
+                    Icon(
+                            imageVector = Icons.Filled.CheckCircle,
+                            contentDescription = "Selected",
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .padding(8.dp)
+                    )
+                }
+            }
             Row(horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.Top,
                     modifier = Modifier.padding(16.dp)) {
