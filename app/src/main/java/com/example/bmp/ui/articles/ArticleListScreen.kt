@@ -1,5 +1,6 @@
 package com.example.bmp.ui.articles
 
+import android.content.Intent
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,9 +29,11 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -40,6 +43,9 @@ import coil3.compose.AsyncImage
 import com.example.bmp.domain.model.Article
 import com.example.bmp.ui.navigation.Screen.Bookmarks
 import com.example.bmp.ui.notes.NoteDialog
+import com.google.android.play.core.splitinstall.SplitInstallManager
+import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
+import com.google.android.play.core.splitinstall.SplitInstallRequest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,6 +67,9 @@ fun ArticleListScreen(navController: NavHostController){
         articlesViewModel.seedArticles()
     }
     
+    val context = LocalContext.current
+    val splitInstallManager = remember { SplitInstallManagerFactory.create(context) }
+    
     Scaffold(
             topBar = {
                 TopAppBar(
@@ -68,6 +77,26 @@ fun ArticleListScreen(navController: NavHostController){
                         actions = {
                             IconButton(onClick = {
                                 navController.navigate(Bookmarks.route)
+                                
+                                //Bookmarks as dynamic delivery
+//                                if(splitInstallManager.installedModules.contains("bookmarks_feature")){
+//                                    context.startActivity(
+//                                            Intent().setClassName(context, "com.example.bookmarks_feature.BookmarksActivity")
+//                                    )
+//                                }else{
+//                                    val request = SplitInstallRequest.newBuilder()
+//                                            .addModule("bookmarks_feature")
+//                                            .build()
+//                                    splitInstallManager.startInstall(request)
+//                                            .addOnSuccessListener {
+//                                                context.startActivity(
+//                                                        Intent().setClassName(context, "com.example.bookmarks_feature.BookmarksActivity")
+//                                                )
+//                                            }
+//                                            .addOnFailureListener { e ->
+//                                                Log.e("DynamicFeature", "Failed to install: ${e.message}")
+//                                            }
+//                                }
                             }) {
                                 Icon(Icons.Default.Bookmarks, contentDescription = "Bookmarks")
                             }
