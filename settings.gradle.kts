@@ -25,3 +25,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "BMP"
 include(":app")
+include(":bookmarks_feature")

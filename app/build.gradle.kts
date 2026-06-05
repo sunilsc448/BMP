@@ -35,6 +35,7 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    dynamicFeatures += setOf(":bookmarks_feature")
 }
 
 dependencies {
@@ -80,4 +81,9 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.turbine)
     testImplementation(libs.kotlinx.coroutines.test)
+    
+    //Dynamic delivery
+    implementation(libs.feature.delivery)
+    implementation(libs.feature.delivery.ktx)
+    
 }
