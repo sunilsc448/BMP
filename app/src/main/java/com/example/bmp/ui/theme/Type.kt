@@ -13,14 +13,15 @@ import com.example.bmp.R
 val Typography = Typography(
         titleMedium = TextStyle(
                 textAlign = TextAlign.Left,
-                fontFamily = FontFamily(Font(R.font.open_sans_regular, weight = FontWeight.SemiBold)),
+                fontFamily = FontFamily(Font(R.font.open_sans_regular)),
+                fontWeight = FontWeight.SemiBold,
                 fontSize = 16.sp,
                 lineHeight = 24.sp,
                 letterSpacing = 0.5.sp
         ),
         bodySmall = TextStyle(
                 textAlign = TextAlign.Left,
-                fontFamily = FontFamily(Font(R.font.open_sans_regular, weight = FontWeight.Normal)),
+                fontFamily = FontFamily(Font(R.font.open_sans_regular)),
                 fontSize = 13.sp,
                 lineHeight = 24.sp,
                 letterSpacing = 0.5.sp
