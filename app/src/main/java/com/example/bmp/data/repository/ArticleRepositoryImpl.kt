@@ -29,4 +29,12 @@ class ArticleRepositoryImpl @Inject constructor (private val articleDao: Article
     override suspend fun insertArticles(articles: List<Article>) {
         articleDao.insertArticles(articles.map {it.toArticleEntity() })
     }
+    
+    override suspend fun getArticlesCount(): Int {
+        return articleDao.getArticlesCount()
+    }
+    
+    override suspend fun removeBookmarks(articleIds: Set<String>) {
+        articleDao.removeBookmarks(articleIds)
+    }
 }

@@ -9,4 +9,6 @@ interface ArticleRepository {
     suspend fun toggleBookmark(id: String, isBookmarked: Boolean)
     suspend fun updateNote(id: String, note: String)
     suspend fun insertArticles(articles: List<Article>)
+    suspend fun getArticlesCount(): Int
+    suspend fun removeBookmarks(articleIds: Set<String>)
 }

@@ -21,6 +21,24 @@ class ArticlesViewModel @Inject constructor(private val articleRepository: Artic
             initialValue = emptyList()
     )
     
+    private val _noteDialogTargetId = MutableStateFlow<String?>(null)
+    val noteDialogTargetId: StateFlow<String?> = _noteDialogTargetId
+    
+    fun openDialog(id: String){
+        _noteDialogTargetId.value = id
+    }
+    
+    fun dismissDialog(){
+        _noteDialogTargetId.value = null
+    }
+    
+    fun saveNote(id:String, note: String){
+        viewModelScope.launch {
+            articleRepository.updateNote(id, note)
+        }
+        dismissDialog()
+    }
+    
     fun toggleBookmark(id:String, isBookmarked: Boolean){
         viewModelScope.launch {
             articleRepository.toggleBookmark(id, isBookmarked)
@@ -29,7 +47,9 @@ class ArticlesViewModel @Inject constructor(private val articleRepository: Artic
     
     fun seedArticles(){
         viewModelScope.launch {
-            articleRepository.insertArticles(SampleData.articles)
+            if(articleRepository.getArticlesCount() == 0) {
+                articleRepository.insertArticles(SampleData.articles)
+            }
         }
     }
 }

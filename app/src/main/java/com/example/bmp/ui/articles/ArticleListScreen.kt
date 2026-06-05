@@ -1,5 +1,6 @@
 package com.example.bmp.ui.articles
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,7 +14,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Bookmarks
+import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.outlined.BookmarkBorder
+import androidx.compose.material.icons.outlined.EditNote
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -28,19 +31,31 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import com.example.bmp.domain.model.Article
 import com.example.bmp.ui.navigation.Screen.Bookmarks
+import com.example.bmp.ui.notes.NoteDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArticleListScreen(navController: NavHostController){
     val articlesViewModel: ArticlesViewModel = hiltViewModel()
     val articles by articlesViewModel.articles.collectAsStateWithLifecycle()
+    
+    val noteDialogTargetId by articlesViewModel.noteDialogTargetId.collectAsStateWithLifecycle()
+    noteDialogTargetId?.let { targetNoteId ->
+        val currentNote = articles.find { it.id ==  targetNoteId}?.note ?: ""
+        NoteDialog(currentNote = currentNote, onSave = { savedNote ->
+            articlesViewModel.saveNote(id = targetNoteId, note = savedNote)
+        }, onDismiss = {
+            articlesViewModel.dismissDialog()
+        })
+    }
     
     LaunchedEffect(Unit) {
         articlesViewModel.seedArticles()
@@ -66,6 +81,8 @@ fun ArticleListScreen(navController: NavHostController){
             items(articles, key = {it.id}){ article ->
                 ArticleCard(article, {
                     articlesViewModel.toggleBookmark(article.id, !article.isBookmarked)
+                }, onNoteClick = {
+                    articlesViewModel.openDialog(id = article.id)
                 })
             }
         }
@@ -73,7 +90,7 @@ fun ArticleListScreen(navController: NavHostController){
 }
 
 @Composable
-fun ArticleCard(article: Article, onBookMarkClicked:() -> Unit){
+fun ArticleCard(article: Article, onBookMarkClicked:() -> Unit, onNoteClick:() -> Unit){
     ElevatedCard(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
         Column{
             AsyncImage(model = article.imageUrl,
@@ -86,7 +103,14 @@ fun ArticleCard(article: Article, onBookMarkClicked:() -> Unit){
                 Column(Modifier.weight(1f)) {
                     Text(article.title, style = MaterialTheme.typography.titleMedium)
                     Spacer(Modifier.height(8.dp))
-                    Text(article.summary, style = MaterialTheme.typography.bodySmall, maxLines = 2)
+                    Text(article.summary, style = MaterialTheme.typography.bodySmall,
+                            maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    Spacer(Modifier.height(8.dp))
+                    Log.d("Debugging> note", article.note)
+                    if (article.note.isNotBlank()) {
+                        Text(article.note, style = MaterialTheme.typography.bodySmall,
+                                maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    }
                 }
                 IconButton(onClick = onBookMarkClicked) {
                     Icon(imageVector = if(article.isBookmarked){
@@ -98,6 +122,15 @@ fun ArticleCard(article: Article, onBookMarkClicked:() -> Unit){
                     }else{
                         "Add bookmark"
                     })
+                }
+                IconButton(onClick = onNoteClick) {
+                    Icon(
+                            imageVector = if (article.note.isBlank())
+                                Icons.Outlined.EditNote
+                            else
+                                Icons.Filled.EditNote,
+                            contentDescription = "Edit note"
+                    )
                 }
             }
         }

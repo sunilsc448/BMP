@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ArticleDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertArticles(articles: List<ArticleEntity>)
     
     @Query("Select * from articles")
@@ -23,4 +23,10 @@ interface ArticleDao {
     
     @Query("UPDATE articles SET note = :note where id = :id")
     suspend fun updateNote(id: String, note: String)
+    
+    @Query("SELECT COUNT(*) FROM articles")
+    suspend fun getArticlesCount(): Int
+    
+    @Query("UPDATE articles SET isBookmarked = 0 WHERE id IN (:articleIds)")
+    suspend fun removeBookmarks(articleIds: Set<String>)
 }
