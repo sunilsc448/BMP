@@ -47,15 +47,15 @@ class BookmarksViewModel @Inject constructor(private val articleRepository: Arti
         dismissDialog()
     }
     
-        fun toggleSelection(id: String) {
-            _selectedIds.update { current ->
-                if (id in current)
-                    current - id
-                else
-                    current + id
-            }
+    fun toggleSelection(id: String) {
+        _selectedIds.update { current ->
+            if (id in current)
+                current - id
+            else
+                current + id
         }
-        
+    }
+    
     fun toggleBookmark(id:String){
         viewModelScope.launch {
             articleRepository.toggleBookmark(id, false)

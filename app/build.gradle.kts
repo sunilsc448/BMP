@@ -72,6 +72,12 @@ dependencies {
     // Navigation
     implementation(libs.androidx.navigation.compose)
     
+    //Coil
     implementation(libs.coil.compose)
     implementation(libs.coil.network)
+    
+    //Unit testing
+    testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
+    testImplementation(libs.kotlinx.coroutines.test)
 }
