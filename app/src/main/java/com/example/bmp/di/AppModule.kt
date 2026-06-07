@@ -19,7 +19,9 @@ object AppModule {
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): AppDatabase =
-        Room.databaseBuilder(context = context, name = "articles_db", klass = AppDatabase::class.java).build()
+        Room.databaseBuilder(context = context, name = "articles_db", klass = AppDatabase::class.java)
+            .addMigrations(AppDatabase.MIGRATION_1_2)
+            .build()
     
     @Provides
     @Singleton
